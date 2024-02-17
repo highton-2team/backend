@@ -1,9 +1,11 @@
 package highton.team2.controller;
 
 import highton.team2.dto.User.UserCreateDto;
+import highton.team2.dto.User.UserLoginDto;
 import highton.team2.entity.User;
 import highton.team2.service.UserService;
 import highton.team2.util.Result;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserLoginDto loginDto, HttpSession session) {
+        boolean isValidUser = userService.validateUserLogin(loginDto);
+        if (isValidUser) {
+            session.setAttribute("userId", loginDto.getUserId()); // 세션에 사용자 아이디 저장
+            return Result.of(HttpStatus.OK, loginDto.getUserId());
+        } else {
+            return Result.of(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정이거나 비밀번호가 잘못 되었습니다.");
+        }
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserCreateDto userCreateDto) {
