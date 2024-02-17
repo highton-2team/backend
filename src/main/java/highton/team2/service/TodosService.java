@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,15 +39,17 @@ public class TodosService {
     }
 
     public TodosResponseDto getTodosByUserId(String userId) {
-        return todosRepository.findByUserId(userId)
-                .map(todos -> {
-                    List<TodoItemDto> todoItems = todoListRepository.findAllByTodosId(todos.getId())
-                            .stream()
-                            .map(todoList -> new TodoItemDto(todoList.getTodoIndex(), todoList.getTodo(), todoList.isCompleted()))
-                            .collect(Collectors.toList());
-                    return new TodosResponseDto(todos.getEnd_date(), todoItems);
-                }).orElseThrow(() -> new RuntimeException("설정된 목표가 없습니다."));
+        return todosRepository.findByUserId(userId).map(todos -> {
+            List<TodoItemDto> todoItems = todoListRepository.findAllByTodosId(todos.getId())
+                    .stream()
+                    .sorted(Comparator.comparingInt(TodoList::getTodoIndex)) // Sort by todoIndex to maintain order
+                    .map(todoList -> new TodoItemDto(todoList.getTodoIndex(), todoList.getTodo(), todoList.isCompleted()))
+                    .collect(Collectors.toList());
+
+            return new TodosResponseDto(todos.getId(), todos.getUserId(), todos.getGoal(), todos.getEnd_date(), todoItems);
+        }).orElseThrow(() -> new RuntimeException("No todos found for user id: " + userId));
     }
+
 
     // TodosService 내부
     public String updateTodoCompletedStatus(String userId, int todoIndex, boolean completed) {
