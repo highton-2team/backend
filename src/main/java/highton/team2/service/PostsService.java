@@ -7,8 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor // Lombok을 사용하여 생성자 자동 생성
+@Transactional(readOnly = true)
 public class PostsService {
 
     private final PostsRepository postsRepository;
@@ -29,4 +32,10 @@ public class PostsService {
 
         return "정상적으로 글이 등록되었습니다.";
     }
+
+    // 모든 게시글을 날짜 내림차순으로 조회
+    public List<Posts> findAllPosts() {
+        return postsRepository.findAllByOrderByCreatedDateDesc();
+    }
+
 }
