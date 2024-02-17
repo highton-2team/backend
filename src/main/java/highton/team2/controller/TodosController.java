@@ -5,11 +5,15 @@ import highton.team2.dto.Todos.TodosResponseDto;
 import highton.team2.dto.Todos.UpdateTodoStatusRequest;
 import highton.team2.service.TodosService;
 import highton.team2.service.UserService;
+import highton.team2.util.GPT;
 import highton.team2.util.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/todolist")
@@ -91,5 +95,16 @@ public class TodosController {
         } catch (Exception e) {
             return Result.of(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생하였습니다.");
         }
+    }
+
+    @PostMapping("/chatbot")
+    public ResponseEntity<?> chatbot(@RequestBody Map<String, String> requestData) {
+        String message = requestData.get("message");
+
+        // GPT 싱글톤 인스턴스 사용
+        GPT gpt = GPT.getInstance();
+        String response = gpt.runGPT(message);
+
+        return Result.of(HttpStatus.OK, response);
     }
 }

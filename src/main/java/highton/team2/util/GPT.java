@@ -6,15 +6,22 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.web.bind.annotation.PathVariable;
 
 public class GPT {
+    private static GPT instance;
     private WebDriver driver;
     private JavascriptExecutor jsExecutor;
 
-    public GPT() {
+    private GPT() {
         System.setProperty("webdriver.chrome.driver", "./chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
-        // options.addArguments("--headless"); // 브라우저 미표시 실행을 위한 옵션, 필요에 따라 제거 가능
         this.driver = new ChromeDriver(options);
         this.jsExecutor = (JavascriptExecutor) driver;
+    }
+
+    public static GPT getInstance() {
+        if (instance == null) {
+            instance = new GPT();
+        }
+        return instance;
     }
 
     public void init() {
@@ -33,8 +40,9 @@ public class GPT {
 
             while (true) {
                 Thread.sleep(1000); // 2초마다 검사
-
-                String script = "const codeElements = document.querySelectorAll('swiper-container > swiper-slide > div > div:nth-child(1)');" + "const lastCodeElement = codeElements[codeElements.length - 1];" + "return lastCodeElement ? lastCodeElement.innerText.replaceAll(',', '').replaceAll('\"', '').replaceAll('[', '').replaceAll(']', '').replaceAll('줄바꿈', '\\n') : '';";
+                String script = "const codeElements = document.querySelectorAll('swiper-container > swiper-slide > div > div:nth-child(1)');" +
+                        "const lastCodeElement = codeElements[codeElements.length - 1];" +
+                        "return lastCodeElement ? lastCodeElement.innerText.replace(/\\n\\n문장 다듬기/g, '') : '';";
                 String currentValue = (String) jsExecutor.executeScript(script);
 
                 if (currentValue.equals(lastValue)) {
