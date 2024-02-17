@@ -48,6 +48,20 @@ public class TodosService {
                 }).orElseThrow(() -> new RuntimeException("설정된 목표가 없습니다."));
     }
 
+    // TodosService 내부
+    public String updateTodoCompletedStatus(String userId, int todoIndex, boolean completed) {
+        Todos todos = todosRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자의 Todos가 존재하지 않습니다."));
+
+        TodoList todoList = todoListRepository.findByTodosIdAndTodoIndex(todos.getId(), todoIndex)
+                .orElseThrow(() -> new RuntimeException("해당 Todo가 존재하지 않습니다."));
+
+        todoList.setCompleted(completed);
+        todoListRepository.save(todoList);
+
+        return completed ? "정상적으로 완료 처리 되었습니다." : "정상적으로 미완료 처리 되었습니다.";
+    }
+
     public boolean existsByUserId(String userId) {
         return todosRepository.findByUserId(userId).isPresent();
     }

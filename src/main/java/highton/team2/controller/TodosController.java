@@ -2,6 +2,7 @@ package highton.team2.controller;
 
 import highton.team2.dto.Todos.TodosCreateDto;
 import highton.team2.dto.Todos.TodosResponseDto;
+import highton.team2.dto.Todos.UpdateTodoStatusRequest;
 import highton.team2.service.TodosService;
 import highton.team2.service.UserService;
 import highton.team2.util.Result;
@@ -53,6 +54,24 @@ public class TodosController {
             return Result.of(HttpStatus.OK, responseDto); // 여기에서 TodosResponseDto 객체를 직접 반환
         } catch (RuntimeException e) {
             return Result.of(HttpStatus.BAD_REQUEST, e.getMessage()); // 에러 메시지도 여전히 처리 가능
+        }
+    }
+
+    @PostMapping("/updateCompleted")
+    public ResponseEntity<?> updateTodoCompleted(@RequestBody UpdateTodoStatusRequest request) {
+        String userId = userService.getSessionUserId();
+        if (userId == null) {
+            return Result.of(HttpStatus.FORBIDDEN, "로그인 후 이용하시기 바랍니다.");
+        }
+        if (request.getTodoId() == 0) {
+            return Result.of(HttpStatus.BAD_REQUEST, "값이 누락되었거나 잘못된 값이 있습니다.");
+        }
+
+        try {
+            String message = todosService.updateTodoCompletedStatus(userId, request.getTodoId(), request.isCompleted());
+            return Result.of(HttpStatus.OK, message);
+        } catch (RuntimeException e) {
+            return Result.of(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }
