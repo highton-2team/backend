@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -25,4 +28,7 @@ public class Posts {
     @Lob
     @Column(nullable = false)
     private String content;
+
+    @CreationTimestamp
+    private LocalDateTime createdDate;
 }
