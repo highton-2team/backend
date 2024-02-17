@@ -1,5 +1,6 @@
 package highton.team2.service;
 
+import highton.team2.dto.PostResponseDto;
 import highton.team2.dto.Posts.PostCreateDto;
 import highton.team2.entity.Posts;
 import highton.team2.repository.PostsRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor // Lombok을 사용하여 생성자 자동 생성
@@ -36,6 +38,11 @@ public class PostsService {
     // 모든 게시글을 날짜 내림차순으로 조회
     public List<Posts> findAllPosts() {
         return postsRepository.findAllByOrderByCreatedDateDesc();
+    }
+
+    public Optional<PostResponseDto> findPostById(Long postId) {
+        return postsRepository.findById(postId)
+                .map(post -> new PostResponseDto(post.getUserId(), post.getId(), post.getTitle(), post.getContent()));
     }
 
 }

@@ -1,7 +1,7 @@
 package highton.team2.controller;
 
 import highton.team2.dto.Posts.PostCreateDto;
-import highton.team2.dto.Posts.PostResponseDto;
+import highton.team2.dto.Posts.AllPostResponseDto;
 import highton.team2.service.PostsService;
 import highton.team2.util.Result;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,21 +34,28 @@ public class PostsController {
         }
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getAllPosts() {
         try {
             var posts = postsService.findAllPosts();
             var responseDtos = posts.stream()
-                    .map(post -> new PostResponseDto(
+                    .map(post -> new AllPostResponseDto(
                             post.getId(),
                             post.getTitle(),
                             post.getContent().substring(0, Math.min(post.getContent().length(), 127)) + "...",
                             post.getUserId()))
                     .collect(Collectors.toList());
-
-            return ResponseEntity.ok(responseDtos);
+            return Result.of(HttpStatus.OK, responseDtos);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return Result.of(HttpStatus.BAD_GATEWAY, "게시글이 존재하지 않는 등 오류가 발생하였습니다.");
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+        return postsService.findPostById(id)
+                .map(post -> Result.of(HttpStatus.OK, post))
+                .orElseGet(() -> Result.of(HttpStatus.NOT_FOUND, null));
+    }
+
 }

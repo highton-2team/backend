@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PostResponseDto {
+public class AllPostResponseDto {
     private Long id;
     private String title;
     private String preview; // 원본 내용을 127자로 자른 내용
