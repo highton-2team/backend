@@ -9,6 +9,7 @@ import highton.team2.repository.TodoListRepository;
 import highton.team2.repository.TodosRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -63,6 +64,22 @@ public class TodosService {
         todoListRepository.save(todoList);
 
         return completed ? "정상적으로 완료 처리 되었습니다." : "정상적으로 미완료 처리 되었습니다.";
+    }
+
+    @Transactional
+    public void cancelTodos(String userId) {
+        // 해당 userId를 가진 Todos 찾기
+        List<Todos> userTodos = todosRepository.findAllByUserId(userId);
+
+        if (userTodos.isEmpty()) {
+            throw new IllegalStateException("등록된 TodoList가 없습니다.");
+        }
+
+        // 각 Todos에 대해 TodoList 항목들을 삭제 후 Todos 삭제
+        userTodos.forEach(todos -> {
+            todoListRepository.deleteByTodosId(todos.getId());
+            todosRepository.delete(todos);
+        });
     }
 
     public boolean existsByUserId(String userId) {

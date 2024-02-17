@@ -9,7 +9,11 @@ import java.util.Optional;
 
 public interface TodoListRepository extends JpaRepository<TodoList, Long> {
     List<TodoList> findAllByTodosId(Long todosId);
+
     Optional<TodoList> findByTodosIdAndTodoIndex(Long todosId, int todoIndex);
+
     List<TodoList> findByTodosId(Long todosId, Sort sort);
+
+    void deleteByTodosId(Long todosId);
 
 }

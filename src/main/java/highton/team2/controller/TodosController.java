@@ -74,4 +74,22 @@ public class TodosController {
             return Result.of(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelTodos() {
+        // 로그인 확인
+        String userId = userService.getSessionUserId();
+        if (userId == null) {
+            return Result.of(HttpStatus.FORBIDDEN, "로그인 후 이용하시기 바랍니다.");
+        }
+
+        try {
+            todosService.cancelTodos(userId);
+            return Result.of(HttpStatus.OK, "정상적으로 취소 처리 되었습니다.");
+        } catch (IllegalStateException e) {
+            return Result.of(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            return Result.of(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생하였습니다.");
+        }
+    }
 }
