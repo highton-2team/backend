@@ -23,9 +23,9 @@ public class CommentController {
     public ResponseEntity<?> createComment(@RequestBody CommentCreateDto dto) {
         try {
             Comment comment = commentService.createComment(dto);
-            return Result.of(HttpStatus.OK, "Comment created successfully");
+            return Result.of(HttpStatus.OK, "댓글이 정상적으로 등록 되었습니다.");
         } catch (Exception e) {
-            return Result.of(HttpStatus.BAD_REQUEST, "Error creating comment: " + e.getMessage());
+            return Result.of(HttpStatus.BAD_REQUEST, "에러가 발생하였습니다. " + e.getMessage());
         }
     }
 }

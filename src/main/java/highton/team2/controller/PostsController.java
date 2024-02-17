@@ -58,7 +58,7 @@ public class PostsController {
                 .orElseGet(() -> Result.of(HttpStatus.NOT_FOUND, null));
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Long id) {
         try {
             postsService.deletePost(id);

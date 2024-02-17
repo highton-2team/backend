@@ -53,7 +53,7 @@ public class TodosController {
             TodosResponseDto responseDto = todosService.getTodosByUserId(userId);
             return Result.of(HttpStatus.OK, responseDto); // 여기에서 TodosResponseDto 객체를 직접 반환
         } catch (RuntimeException e) {
-            return Result.of(HttpStatus.BAD_REQUEST, e.getMessage()); // 에러 메시지도 여전히 처리 가능
+            return Result.of(HttpStatus.BAD_REQUEST, "설정된 목표가 없습니다."); // 에러 메시지도 여전히 처리 가능
         }
     }
 
