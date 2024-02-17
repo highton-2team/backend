@@ -58,4 +58,13 @@ public class PostsController {
                 .orElseGet(() -> Result.of(HttpStatus.NOT_FOUND, null));
     }
 
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable Long id) {
+        try {
+            postsService.deletePost(id);
+            return Result.of(HttpStatus.OK, "정상적으로 게시글이 삭제 되었습니다.");
+        } catch (Exception e) {
+            return Result.of(HttpStatus.BAD_REQUEST, "게시글이 존재하지 않습니다.");
+        }
+    }
 }
