@@ -1,8 +1,10 @@
 package highton.team2.service;
 
-import highton.team2.dto.PostResponseDto;
+import highton.team2.dto.Comment.CommentResponseDto;
+import highton.team2.dto.Posts.PostResponseDto;
 import highton.team2.dto.Posts.PostCreateDto;
 import highton.team2.entity.Posts;
+import highton.team2.repository.CommentsRepository;
 import highton.team2.repository.PostsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor // Lombok을 사용하여 생성자 자동 생성
@@ -18,6 +21,7 @@ public class PostsService {
 
     private final PostsRepository postsRepository;
     private final UserService userService; // final로 선언된 필드에 대한 생성자를 자동 생성
+    private final CommentsRepository commentsRepository; // 댓글 리포지토리 추가
 
     @Transactional
     public String createPost(PostCreateDto createDto) {
@@ -42,7 +46,13 @@ public class PostsService {
 
     public Optional<PostResponseDto> findPostById(Long postId) {
         return postsRepository.findById(postId)
-                .map(post -> new PostResponseDto(post.getUserId(), post.getId(), post.getTitle(), post.getContent()));
+                .map(post -> {
+                    var comments = commentsRepository.findByPostId(post.getId()) // 댓글 조회
+                            .stream()
+                            .map(comment -> new CommentResponseDto(comment.getId(), comment.getUserId(), comment.getContent()))
+                            .collect(Collectors.toList());
+                    return new PostResponseDto(post.getUserId(), post.getId(), post.getTitle(), post.getContent(), comments);
+                });
     }
 
 }
