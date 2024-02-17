@@ -3,10 +3,13 @@ package highton.team2.controller;
 import highton.team2.dto.User.UserCreateDto;
 import highton.team2.entity.User;
 import highton.team2.service.UserService;
+import highton.team2.util.Result;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -16,12 +19,12 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/")
-    public ResponseEntity<?> register(UserCreateDto userCreateDto) {
-        User userByUserId = userService.findUserByUserId(userCreateDto.getUserId());
-        if (userCreateDto.getUserId().isEmpty() || userByUserId != null) {
-            return ResponseEntity.badRequest().body("값이 누락되었거나 잘못된 값이 있습니다.");
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserCreateDto userCreateDto) {
+        if (userService.findUserByUserId(userCreateDto.getUserId()) != null) {
+            return Result.of(HttpStatus.FORBIDDEN, "이미 존재하는 아이디입니다.");
         }
-        return ResponseEntity.ok(userCreateDto.getUserId());
+        userService.createUser(userCreateDto);
+        return Result.of(HttpStatus.OK, userCreateDto.getUserId());
     }
 }

@@ -21,7 +21,11 @@ public class UserService {
     }
 
     public User findUserByUserId(String userId) {
-        Optional<User> byId = userRepository.findById(userId);
-        return byId.get();
+        try {
+            Optional<User> byId = userRepository.findById(userId);
+            return byId.get();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
